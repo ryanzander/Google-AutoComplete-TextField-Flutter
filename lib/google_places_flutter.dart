@@ -85,12 +85,16 @@ class _GooglePlaceAutoCompleteTextFieldState
 
   bool isCrossBtn = true;
   late final Dio _dio;
+  late final FocusNode _focusNode;
 
   CancelToken? _cancelToken = CancelToken();
 
   @override
   void dispose() {
     subject.close();
+    if (widget.focusNode == null) {
+      _focusNode.dispose();
+    }
     super.dispose();
   }
 
@@ -120,7 +124,7 @@ class _GooglePlaceAutoCompleteTextFieldState
                 decoration: widget.inputDecoration,
                 style: widget.textStyle,
                 controller: widget.textEditingController,
-                focusNode: widget.focusNode ?? FocusNode(),
+                focusNode: _focusNode,
                 textInputAction: widget.textInputAction ?? TextInputAction.done,
                 onFieldSubmitted: (value) {
                   if (widget.formSubmitCallback != null) {
@@ -224,6 +228,7 @@ class _GooglePlaceAutoCompleteTextFieldState
   void initState() {
     super.initState();
     _dio = Dio();
+    _focusNode = widget.focusNode ?? FocusNode();
     subject.stream
         .distinct()
         .debounceTime(Duration(milliseconds: widget.debounceTime))
